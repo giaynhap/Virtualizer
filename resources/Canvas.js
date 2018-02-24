@@ -52,7 +52,7 @@ Canvas.prototype = {
 	},
 	preUpdate()
 	{
-		this.ctx.save(); 
+	//	this.ctx.save(); 
 		this.ctx.fillStyle="white";
 		this.ctx.clearRect(0, 0, this.element.width,this.element.height);
 		
@@ -62,7 +62,7 @@ Canvas.prototype = {
  		this.ctx.fillStyle=this.fillColor;
 		this.ctx.shadowBlur = 20;
 		this.ctx.shadowColor =  this.shadowColor;
-			this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+		
 		this.ctx.fillText("by Giay Nhap @2018",this.element.width-115,10);
 		 
 
@@ -70,7 +70,7 @@ Canvas.prototype = {
 	beforeUpdate()
 	{
  			this.ctx.globalAlpha=1;
- 				this.ctx.restore(); 
+ 			//	this.ctx.restore(); 
 	}
 	,
 	update:function()

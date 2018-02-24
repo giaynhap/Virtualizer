@@ -194,33 +194,24 @@ this.resetPoligonData(elm);
  
 
 			radius-=2;
-				this.ctx.moveTo(radius*Math.cos(this.rot),radius*Math.sin(this.rot));
+			this.ctx.moveTo(radius*Math.cos(this.rot),radius*Math.sin(this.rot));
 			for (var i = 0; i < this.sides ; i++) {
-			
-		 
- 			 data= this.moveData[i];
- 		
-
+ 				 data= this.moveData[i];
  			 	this.ctx.lineTo((radius-data)*Math.cos(a*i+this.rot),(radius-data)*Math.sin(a*i+this.rot));
 
-		 
-			
-			
 			}
- 		 
-		  //(react_x * 0.07)
-
-		  
+ 
 			this.ctx.closePath();
-
+					this.ctx.stroke();
 			this.ctx.setTransform(1, 0, 0, 1, 0, 0);
 			 
 			var per = react_x/6000;
+		 
 			 this.ctx.translate(-per*this.pos.x,-per*this.pos.y*2);
 			 this.ctx.scale(1+per,1+per);
 
 			this.ctx.globalAlpha=this.alpha;
-			this.ctx.stroke();
+		
 		
 		},
 		updateData:function(data)
