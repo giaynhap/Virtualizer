@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<style type="text/css">
+	body{
+		margin: 0;
+		overflow: hidden;
+	}
+	.switch {
+  position: relative;
+  display: inline-block;
+  width: 32px;
+  height: 18px;
+}
+
+	.switch input {display:none;}
+
+	.slider {
+	  position: absolute;
+	  cursor: pointer;
+	  top: 0;
+	  left: 0;
+	  right: 0;
+	  bottom: 0;
+	  background-color: #ccc;
+	  -webkit-transition: .4s;
+	  transition: .4s;
+	}
+
+	.slider:before {
+	  position: absolute;
+	  content: "";
+	  height: 16px;
+	  width: 16px;
+	  left: 2px;
+	  bottom: 1px;
+	  background-color: white;
+	  -webkit-transition: .4s;
+	  transition: .4s;
+	}
+
+	input:checked + .slider {
+	  background-color: #2196F3;
+	}
+
+	input:focus + .slider {
+	  box-shadow: 0 0 1px #2196F3;
+	}
+
+	input:checked + .slider:before {
+	  -webkit-transform: translateX(14px);
+	  -ms-transform: translateX(14px);
+	  transform: translateX(14px);
+	}
+
+	/* Rounded sliders */
+	.slider.round {
+	  border-radius: 34px;
+	}
+
+	.slider.round:before {
+	  border-radius: 50%;
+	}
+
+	#content{
+		position: absolute;
+		bottom: 5px;
+		z-index: 10;
+		padding: 10px;
+		 
+		width: 100%;;
+	}
+	.btnChooseFile
+	{
+		position: absolute;
+		background-color: #ffffff;
+		width: 40px;
+		height: 40px;
+		border-radius: 5px;
+		cursor: pointer;
+		opacity: 0.2;
+		line-height: 40px;
+		text-align: center;
+		color: blue;
+		font-size: 20px;
+		bottom: 0px;
+	}
+	.btnChooseFile:hover{
+		opacity: 0.3
+	}
+	.btnPlay{
+	 	display: none;
+	 	border-radius: 300px;
+		position: fixed;
+	  	width: 100px;
+	  	height: 100px;
+	  	top:calc(50% - 50px);
+	  	left: calc(50% - 50px);
+	  	z-index: 10;
+	  	font-size: 50px;
+	  	 
+	  	color: white;
+	  	
+	  	background-color: rgba(0,0,0,0.2);
+	  	cursor: pointer;
+	  	line-height: 110px;
+	  	text-align: center;
+	  	opacity: 0;
+	  	 animation-name: start;
+  		animation-duration: 5s;
+  		animation-delay:2s;
+  		animation-fill-mode: forwards;
+
+	}
+	.btnPlay:hover{
+		background-color: rgba(0,0,0,0.1);
+	}
+
+	.sliderBar{
+		cursor: pointer;
+		width: calc(100% - 120px);
+		height: 5px;
+		background-color: rgba(0,0,0,0.4);
+		margin-left: 60px;
+	}
+	.sliderTime{
+		width: 100px;
+		height: 5px;
+		background-color: black;
+	}
+	.btnSetting{
+		position: absolute;
+		background-color: #ffffff;
+		width: 40px;
+		height: 40px;
+		border-radius: 5px;
+		cursor: pointer;
+		opacity: 0.2;
+		line-height: 40px;
+		text-align: center;
+		color: blue;
+		font-size: 20px;
+		bottom: 45px;
+
+	}
+	.btnSetting:hover{
+			opacity: 0.3
+	}
+	@keyframes start {
+    from {opacity: 0}
+    to {opacity:1;}
+}
+</style>
+<head>
+	<title>Music Vitualizer</title>
+    <link rel="stylesheet" href="resources/bootstrap.min.css">
+    <script src="resources/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="resources/farbtastic.js"></script>
+
+<link rel="stylesheet" href="resources/farbtastic.css" type="text/css" />
+</head>
+<body>
+<div id="content">
+  <input type="file" id="thefile" accept="audio/*" style="display: none" />
+  			<div class="sliderBar">
+  				<div class="sliderTime"></div>
+  				
+  			</div>
+    	<div class="btnChooseFile"> <span class="glyphicon glyphicon-open-file"></span>
+  		</div>
+  		<div class="btnSetting"  data-toggle="modal" data-target="#myModal" > <span class="glyphicon glyphicon glyphicon-cog"></span>
+    		</div>
+
+ 
+</div>
+  	<div class="btnPlay"> <span class="glyphicon glyphicon-play"></span>
+  	</div>
+	<canvas id = "canvas" width="100%" height="100%"></canvas>
+
+	<canvas id = "canvasTemp" width="100%" height="100%" ></canvas>
+
+	<script src= "resources/Vector.js"></script>
+	<script src= "resources/Polygon.js"></script>
+		<script src= "resources/EffectMove.js"></script>
+
+	<script src= "resources/Circle.js"></script> <script src=
+	"resources/Canvas.js"></script>
+
+
+	<script>
+
+
+			/// slider control normal
+				var sliderBar = $(".sliderBar");
+				var sliderTitme = $(".sliderTime");
+
+				var sliderWidth = sliderBar.width();
+
+					sliderTitme.css({"width":0});
+
+				function updateValue(value)
+				{
+					sliderTitme.css({"width":value/100*sliderWidth});
+				}
+				function seek(value)
+				{
+					
+		 			audio.currentTime =  audio.duration*value/1000
+				}
+
+
+			///
+
+
+
+		canvas= new Canvas("canvas");
+		canvas.init();
+		var audio = new Audio();
+		  var file = document.getElementById("thefile");
+		  
+		  file.onchange = function() {
+    var files = this.files;
+    audio.src = URL.createObjectURL(files[0]);
+    audio.load();
+    audio.autoplay = true;
+    audio.play();
+    var context = new AudioContext();
+    var src = context.createMediaElementSource(audio);
+    var analyser = context.createAnalyser();
+ 
+    src.connect(analyser);
+    analyser.connect(context.destination);
+
+    analyser.fftSize = 32;
+
+    var bufferLength = analyser.frequencyBinCount;
+    console.log(bufferLength);
+
+    var dataArray = new Uint8Array(bufferLength);
+
+ function renderFrame() {
+      requestAnimationFrame(renderFrame);
+ 
+      analyser.getByteFrequencyData(dataArray);
+      canvas.updateData(dataArray);
+   
+
+   		updateValue((100 / audio.duration) * audio.currentTime);
+    }
+    renderFrame();
+
+ 
+};
+
+
+// click
+
+$(".btnChooseFile").click(function(){
+			$('#thefile').trigger('click'); 
+})
+
+$(".sliderBar").click(function(e){
+		if (audio.paused) return;
+		 var size =  event.clientX - $(this).offset().left;
+		 seek(size/sliderWidth*1000);
+})
+
+$( window ).resize(function() {
+ 
+  canvas.onresize();
+	 
+
+});
+
+
+	</script>
+
+</body>
+<modal>
+	<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Setting</h4>
+      </div>
+      <div class="modal-body">
+     	<div class="row">
+     		<div class="col-sm-12">
+     			<div class="col-sm-12">
+
+					<label class="switch">
+					  <input type="checkbox" id = "showeffect" checked>
+					  <span class="slider round"></span>
+					</label>
+					Enable Effect
+     			</div>
+     			<hr>
+     			<div class="col-sm-12">
+
+					 
+				 	<code>Fill Color</code>
+				 	<input  class = "form-control" type="text" id="color" name="color" value="#ffffff" />
+
+					<div id="colorpicker"></div>
+
+     			</div>
+     			<hr>
+     			<div class="col-sm-12">
+
+					 
+				 	<code>Background</code>
+				  
+				 		  <input id="settingBG" type='file'  accept="image/*" onchange="previewFile()" />
+     			</div>
+
+     			 
+     		</div>
+
+     	</div>
+      </div>
+      
+      </div>
+    </div>
+
+  </div>
+</div>
+<script type="text/javascript">
+
+
+	var picker=  $.farbtastic('#colorpicker') 
+	picker.setColor("#ffffff"); 
+	picker.linkTo(function(value) {
+	 	
+	 canvas.setFillColor(value)
+	 $("#color").val = value;
+	 	for (k in effects)
+	  	changColor(value,effects[k]);
+		});
+ 	$('#showeffect').change(function() {
+	 	
+      
+         canvas.setShowEffect( $(this).is(':checked'))
+	}); 
+
+ function previewFile() {
+  
+  var file    = document.querySelector('#settingBG').files[0];
+ 
+  var reader  = new FileReader();
+
+  reader.onloadend = function () {
+ 
+     canvas.setBackGroundImage( reader.result)
+  }
+
+  if (file) {
+    reader.readAsDataURL(file);
+  } else {
+ 
+  }
+}
+
+
+var temp = document.getElementById("canvasTemp");
+var ctxTmp = temp.getContext("2d");
+ 
+temp.width=130
+temp.height=46
+
+function changColor(color,image)
+{
+	ctxTmp.clearRect(0,0,temp.width, temp.height)
+
+	ctxTmp.drawImage(image,0,0);
+
+	var imgData = ctxTmp.getImageData(0, 0,temp.width,temp.height);
+	var data = imgData.data;
+
+	col =  hexToRgb(color);
+
+	for (var i=0;i<data.length;i+=4)
+	{
+		 data[i]=col.r;
+		 data[i+1]=col.g;
+		 data[i+2]=col.b;
+	}
+	ctxTmp.putImageData(imgData,0,0);
+	var imagev = temp.toDataURL('image/png'); 
+	image.src = imagev;
+ 
+}
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+</script>
+</modal>
+</html>
